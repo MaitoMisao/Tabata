@@ -131,11 +131,18 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     //リセットダイアログの表示
     func resetAlert() {
         let alertAction = UIAlertController(title: "タイマーリセット", message: "リセットしますか？", preferredStyle: .alert)
-               
-        alertAction.addAction(UIAlertAction(title: "リセット", style: .default, handler: {action in self.firestStartTimer()}))
-        alertAction.addAction(UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in self.timerStart()}))
-               
-               self.present(alertAction, animated: true, completion: nil)
+        
+        // UIAlertActionとAddActionの部分を切りわかるその方が綺麗に見えるため
+        let resetAction = UIAlertAction(title: "リセット", style: .default, handler: {action in self.firestStartTimer()
+        })
+        
+        // cencelは無しもしないように変更
+        let cencelAction  = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        
+        // Actionを追加する
+        alertAction.addAction(resetAction)
+        alertAction.addAction(cencelAction)
+        self.present(alertAction, animated: true, completion: nil)
     }
     
     @objc func longPress(_ sender: UILongPressGestureRecognizer) {
@@ -143,6 +150,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             print("ロングプレス")
             resetAlert()
             timer?.invalidate()
+            stopTime()
         } else if sender.state == .ended {
             print("ロング押した!")
         }
@@ -176,10 +184,25 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         count = 11
         view.backgroundColor = UIColor(hex: "fffc79")
     }
-    //初期化
+    // 初期化と書いていあるなら、メソッド名も reset data的な名前を使った方がい良いですmm
     private func firestStartTimer() {
-        count = 11
-        hideLap()
+        
+        self.count = 11
+        
+        // 23-26までの値を初期化すれば大丈夫だと思います。
+        // selfがあった方が見やすいので、よかったら今後つけてみてください。
+        self.workoutCount = 21
+        self.buttonOn = 0
+        self.leftCount = 7
+        self.rightCount = 8
+        
+        // 最初からしたいので、TEXTも更新するといいかもです。
+        self.countLabel.text = "START"
+        
+        // 開始できるように初期化する
+        self.btnStopAndRestart.tag = 0
+        
+        self.hideLap()
         btnStopAndRestart.setImage(UIImage(named: "timer_plain"), for: .normal)
         view.backgroundColor = UIColor(hex: "76d6ff")
     }
