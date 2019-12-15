@@ -133,11 +133,14 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         let alertAction = UIAlertController(title: "タイマーリセット", message: "リセットしますか？", preferredStyle: .alert)
         
         // UIAlertActionとAddActionの部分を切りわかるその方が綺麗に見えるため
-        let resetAction = UIAlertAction(title: "リセット", style: .default, handler: {action in self.firestStartTimer()
+        let resetAction = UIAlertAction(title: "リセット", style: .default, handler: {action in
+            self.firestStartTimer()
         })
         
         // cencelは無しもしないように変更
-        let cencelAction  = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        let cencelAction  = UIAlertAction(title: "キャンセル", style: .cancel, handler: { action in
+            self.timerStart()
+        })
         
         // Actionを追加する
         alertAction.addAction(resetAction)
