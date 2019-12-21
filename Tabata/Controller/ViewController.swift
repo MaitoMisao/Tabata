@@ -16,13 +16,12 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     @IBOutlet weak var lapRight: UILabel!
     
     @IBOutlet weak var btnStopAndRestart: UIButton!
-    
-    
+    @IBOutlet weak var resetBtn: UIButton!
     
     var count = 11
     var workoutCount = 21
-    var buttonOn = 0
-    var leftCount = 7
+
+    var leftCount = 6
     var rightCount = 8
     var timer: Timer?
     
@@ -32,14 +31,16 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         lapLeft.isHidden = true
         lapMiddle.isHidden = true
         lapRight.isHidden = true
+        resetBtn.isHidden = true
     }
-    
     
     func showLap() {
         lapLeft.isHidden = false
         lapMiddle.isHidden = false
         lapRight.isHidden = false
+        resetBtn.isHidden = false
     }
+    
     
     //10秒スタート
     func timerStart() {
@@ -49,10 +50,11 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     //タイマー起動中、ボタンを押したら止まる
     @objc func stopTime() {
         print("停止")
-        timer?.invalidate()
+        self.timer?.invalidate()
     }
     
     @objc func timerCountDown() {
+        resetBtn.isHidden = false
         count -= 1
         countLabel.text = String(count)
         
@@ -64,7 +66,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             //インターバルタイマーストップ
-            timer?.invalidate()
+            self.timer?.invalidate()
             
             //ワークアウト開始(20秒)
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(workoutCountDown), userInfo: nil, repeats: true)
@@ -88,7 +90,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             } else if workoutCount == 0 && leftCount == 8 {
                 //Stop処理
                 stopTime()
-                timer?.invalidate()
+                self.timer?.invalidate()
                 countLabel.text = "FINISH"
                 view.backgroundColor = UIColor.red
             }
@@ -101,10 +103,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideLap()
-        
         //長押しでダイアログ表示
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
-        view.addGestureRecognizer(longPressGesture)
+//        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
+//        view.addGestureRecognizer(longPressGesture)
         
     }
     
@@ -116,7 +117,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         if sender.tag == 0 {
             sender.tag = 1
             timerStart()
-            startTimerImage()
             print("動く")
             
         } else {
@@ -132,21 +132,37 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     func resetAlert() {
         let alertAction = UIAlertController(title: "タイマーリセット", message: "リセットしますか？", preferredStyle: .alert)
                
-        alertAction.addAction(UIAlertAction(title: "リセット", style: .default, handler: {action in self.firestStartTimer()}))
-        alertAction.addAction(UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in self.timerStart()}))
-               
-               self.present(alertAction, animated: true, completion: nil)
+        let resetAction = UIAlertAction(title: "リセット", style: .default, handler: {action in self.resetStartTimer()})
+        
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in
+            self.timerStart()})
+        
+        alertAction.addAction(resetAction)
+        alertAction.addAction(cancelAction)
+        self.present(alertAction, animated: true, completion: nil)
     }
     
-    @objc func longPress(_ sender: UILongPressGestureRecognizer) {
-        if sender.state == .began {
-            print("ロングプレス")
-            resetAlert()
-            timer?.invalidate()
-        } else if sender.state == .ended {
-            print("ロング押した!")
-        }
+//    @objc func longPress(_ sender: UILongPressGestureRecognizer) {
+//        if sender.state == .began {
+//            print("ロングプレス")
+//            resetAlert()
+//            timer?.invalidate()
+//            stopTime()
+//        } else if sender.state == .ended {
+//            print("ロング押した!")
+//        }
+//    }
+    
+    
+    @IBAction func reset(_ sender: Any) {
+        resetAlert()
+        self.timer?.invalidate()
+        stopTime()
+        print("リセットボタン押した")
     }
+    
+    
+    
     
     //MARK: - Private
     //スタートタイマー画像
@@ -164,7 +180,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
         
         workoutCount = 21
-        timer?.invalidate()
+        self.timer?.invalidate()
         self.hideLap()
         
         if lapLeft.isHidden == true {
@@ -177,9 +193,21 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         view.backgroundColor = UIColor(hex: "fffc79")
     }
     //初期化
-    private func firestStartTimer() {
-        count = 11
-        hideLap()
+    private func resetStartTimer() {
+        self.count = 11
+        
+        self.workoutCount = 21
+        self.leftCount = 7
+        self.rightCount = 8
+        
+        //countLabel.textの更新
+        self.countLabel.text = "START"
+        
+        //開始の初期化
+        self.btnStopAndRestart.tag = 0
+        
+        self.hideLap()
+        
         btnStopAndRestart.setImage(UIImage(named: "timer_plain"), for: .normal)
         view.backgroundColor = UIColor(hex: "76d6ff")
     }
