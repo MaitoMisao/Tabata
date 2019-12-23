@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIGestureRecognizerDelegate {
+class ViewController: UIViewController {
     
     @IBOutlet weak var countLabel: UILabel!
     @IBOutlet weak var lapLeft: UILabel!
@@ -20,12 +20,13 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var count = 11
     var workoutCount = 21
-
-    var leftCount = 6
+    var leftCount = 7
     var rightCount = 8
-    var timer: Timer?
     
     var soundFile = Sound()
+    
+    var tenCount:Timer?
+    var twentyCount:Timer?
     
     func hideLap() {
         lapLeft.isHidden = true
@@ -44,19 +45,32 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     
     //10秒スタート
     func timerStart() {
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerCountDown), userInfo: nil, repeats: true)
+        self.tenCount = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerCountDown), userInfo: nil, repeats: true)
+    }
+    
+    //ワークアウト開始(20秒)
+    func workoutStart() {
+        self.twentyCount = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(workoutCountDown), userInfo: nil, repeats: true)
     }
     
     //タイマー起動中、ボタンを押したら止まる
     @objc func stopTime() {
         print("停止")
-        self.timer?.invalidate()
+        self.tenCount?.invalidate()
+        self.twentyCount?.invalidate()
+    }
+    
+    //FINISH後のイベント
+    @objc func tapFinish() {
+        resetAlert()
+        print("FINISHからの再開")
     }
     
     @objc func timerCountDown() {
         resetBtn.isHidden = false
         count -= 1
         countLabel.text = String(count)
+    
         
         if count <= 1 {
             //インターバルが0になった時に呼ばれる
@@ -66,10 +80,9 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             }
             
             //インターバルタイマーストップ
-            self.timer?.invalidate()
+            self.tenCount?.invalidate()
+            workoutStart()
             
-            //ワークアウト開始(20秒)
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(workoutCountDown), userInfo: nil, repeats: true)
         } else if count == 3 {
             soundFile.beforeThreeCount(name: "Countdown", extentionName: "mp3")
         }
@@ -90,9 +103,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             } else if workoutCount == 0 && leftCount == 8 {
                 //Stop処理
                 stopTime()
-                self.timer?.invalidate()
                 countLabel.text = "FINISH"
                 view.backgroundColor = UIColor.red
+                hideLap()
+                resetBtn.isHidden = true
             }
             
         } else if workoutCount == 3 {
@@ -103,9 +117,6 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideLap()
-        //長押しでダイアログ表示
-//        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(_:)))
-//        view.addGestureRecognizer(longPressGesture)
         
     }
     
@@ -118,9 +129,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
             sender.tag = 1
             timerStart()
             print("動く")
-            
+        } else if workoutCount == 0 && leftCount == 8 {
+            stopTime()
+            tapFinish() //FINISH中タップした後、イベント発動
         } else {
-            
             sender.tag = 0
             stopTime()
             print("stop")
@@ -142,21 +154,10 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         self.present(alertAction, animated: true, completion: nil)
     }
     
-//    @objc func longPress(_ sender: UILongPressGestureRecognizer) {
-//        if sender.state == .began {
-//            print("ロングプレス")
-//            resetAlert()
-//            timer?.invalidate()
-//            stopTime()
-//        } else if sender.state == .ended {
-//            print("ロング押した!")
-//        }
-//    }
-    
     
     @IBAction func reset(_ sender: Any) {
         resetAlert()
-        self.timer?.invalidate()
+        self.tenCount?.invalidate()
         stopTime()
         print("リセットボタン押した")
     }
@@ -180,7 +181,7 @@ class ViewController: UIViewController, UIGestureRecognizerDelegate {
         btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
         
         workoutCount = 21
-        self.timer?.invalidate()
+        self.tenCount?.invalidate()
         self.hideLap()
         
         if lapLeft.isHidden == true {
