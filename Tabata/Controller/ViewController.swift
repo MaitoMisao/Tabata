@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     
     var count = 11
     var workoutCount = 21
-    var leftCount = 7
+    var leftCount = 6
     var rightCount = 8
     
     var soundFile = Sound()
@@ -55,7 +55,6 @@ class ViewController: UIViewController {
     
     //タイマー起動中、ボタンを押したら止まる
     @objc func stopTime() {
-        print("停止")
         self.tenCount?.invalidate()
         self.twentyCount?.invalidate()
     }
@@ -117,6 +116,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideLap()
+        if count == 3 && workoutCount == 3 {
+            soundFile.audioPlayerDif()
+        }
         
     }
     
@@ -129,6 +131,7 @@ class ViewController: UIViewController {
             sender.tag = 1
             timerStart()
             print("動く")
+            soundFile.player?.play()
         } else if workoutCount == 0 && leftCount == 8 {
             stopTime()
             tapFinish() //FINISH中タップした後、イベント発動
@@ -136,8 +139,9 @@ class ViewController: UIViewController {
             sender.tag = 0
             stopTime()
             print("stop")
-            
+            soundFile.player?.pause()
         }
+        
     }
     
     //リセットダイアログの表示
@@ -181,7 +185,7 @@ class ViewController: UIViewController {
         btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
         
         workoutCount = 21
-        self.tenCount?.invalidate()
+        self.twentyCount?.invalidate()
         self.hideLap()
         
         if lapLeft.isHidden == true {

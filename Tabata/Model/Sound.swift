@@ -24,5 +24,16 @@ class Sound {
             print("OFF")
         }
     }
+    
+    func audioPlayerDif() {
+        let audioPath = Bundle.main.path(forResource: "Countdown", ofType: "mp3")!
+        
+        do {
+            try player = AVAudioPlayer(contentsOf: NSURL(fileURLWithPath: audioPath) as URL)
+        } catch {
+            player = nil
+            print("error")
+        }
+    }
 }
 
