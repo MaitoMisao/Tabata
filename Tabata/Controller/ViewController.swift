@@ -69,13 +69,13 @@ class ViewController: UIViewController {
         resetBtn.isHidden = false
         count -= 1
         countLabel.text = String(count)
-    
         
-        if count <= 1 {
+        if count < 1 {
             //インターバルが0になった時に呼ばれる
-            if count == 1 {
+            if count == 0 {
                 leftCount += 1
                 lapLeft.text = String(leftCount)
+                workoutCount = 21
             }
             
             //インターバルタイマーストップ
@@ -83,7 +83,14 @@ class ViewController: UIViewController {
             workoutStart()
             
         } else if count == 3 {
+            // 再生音声ファイル設定
             soundFile.beforeThreeCount(name: "Countdown", extentionName: "mp3")
+        }
+        
+        // 3秒以下 かつ 音楽が再生されていないこと
+        if count <= 3 && !(soundFile.player?.isPlaying ?? true){
+            // 音楽を再生する
+            soundFile.player?.play()
         }
     }
     
@@ -94,8 +101,9 @@ class ViewController: UIViewController {
         countLabel.text = String(workoutCount)
         showLap()
         view.backgroundColor = UIColor(hex: "ffc400")
+    
         
-        if workoutCount <= 1 {
+        if workoutCount < 1 {
             // change処理
             if leftCount < 8 {
                 self.changeToIntervalTimerSetting()
@@ -107,19 +115,22 @@ class ViewController: UIViewController {
                 hideLap()
                 resetBtn.isHidden = true
             }
-            
         } else if workoutCount == 3 {
+            // 再生音声ファイル設定
             soundFile.beforeThreeCount(name: "Countdown", extentionName: "mp3")
+        }
+        
+        // 3秒以下 かつ 音楽が再生されていないこと
+        if workoutCount <= 3 && !(soundFile.player?.isPlaying ?? true){
+            // 音楽を再生する
+            soundFile.player?.play()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         hideLap()
-        if count == 3 && workoutCount == 3 {
-            soundFile.audioPlayerDif()
-        }
-        
+        soundFile.audioPlayerDif()
     }
     
     
@@ -129,9 +140,16 @@ class ViewController: UIViewController {
         print("ボタンクリック")
         if sender.tag == 0 {
             sender.tag = 1
-            timerStart()
-            print("動く")
-            soundFile.player?.play()
+            
+            
+            if count <= 1 {
+                // countが1秒以下の時に、workoutStartを起動させる
+                workoutStart()
+            } else {
+                // それ以外のときはtimerを追加する
+                timerStart()
+            }
+            
         } else if workoutCount == 0 && leftCount == 8 {
             stopTime()
             tapFinish() //FINISH中タップした後、イベント発動
@@ -165,9 +183,7 @@ class ViewController: UIViewController {
         stopTime()
         print("リセットボタン押した")
     }
-    
-    
-    
+
     
     //MARK: - Private
     //スタートタイマー画像
@@ -184,7 +200,6 @@ class ViewController: UIViewController {
     private func changeToIntervalTimerSetting() {
         btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
         
-        workoutCount = 21
         self.twentyCount?.invalidate()
         self.hideLap()
         
