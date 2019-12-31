@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_5" orientation="portrait" appearance="light"/>
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -22,7 +22,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AQp-5I-fS9">
-                                <rect key="frame" x="253.66666666666663" y="390" width="27" height="48"/>
+                                <rect key="frame" x="253.5" y="390" width="27" height="48"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="40"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
@@ -61,6 +61,17 @@
                                     <constraint firstItem="lRL-6q-WEB" firstAttribute="centerX" secondItem="otN-Ev-NwW" secondAttribute="centerX" id="z7e-q1-Sw8"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tUC-lm-IYR">
+                                <rect key="frame" x="177" y="451" width="60" height="60"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="sb8-bI-4pD"/>
+                                    <constraint firstAttribute="height" constant="60" id="urV-3o-Vxf"/>
+                                </constraints>
+                                <state key="normal" image="reset_button"/>
+                                <connections>
+                                    <action selector="reset:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mso-nL-gW3"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.46202266219999999" green="0.83828371759999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
@@ -75,8 +86,10 @@
                             <constraint firstItem="hkm-RA-ShL" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="TPF-d2-und"/>
                             <constraint firstItem="hkm-RA-ShL" firstAttribute="baseline" secondItem="cvb-bh-4aR" secondAttribute="baseline" id="XMO-IU-Jvg"/>
                             <constraint firstItem="otN-Ev-NwW" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="eOa-0j-XQB"/>
+                            <constraint firstItem="tUC-lm-IYR" firstAttribute="top" secondItem="hkm-RA-ShL" secondAttribute="bottom" constant="13" id="fIU-xY-aqU"/>
                             <constraint firstItem="otN-Ev-NwW" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="hXP-dq-DqA"/>
                             <constraint firstItem="AQp-5I-fS9" firstAttribute="leading" secondItem="hkm-RA-ShL" secondAttribute="trailing" constant="38.5" id="qXN-hN-Ohx"/>
+                            <constraint firstItem="tUC-lm-IYR" firstAttribute="centerX" secondItem="hkm-RA-ShL" secondAttribute="centerX" id="ynH-3f-fLm"/>
                             <constraint firstItem="hkm-RA-ShL" firstAttribute="baseline" secondItem="AQp-5I-fS9" secondAttribute="baseline" id="zaw-7R-ogj"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -87,14 +100,16 @@
                         <outlet property="lapLeft" destination="cvb-bh-4aR" id="pWZ-0D-rLX"/>
                         <outlet property="lapMiddle" destination="hkm-RA-ShL" id="NIV-bB-TTK"/>
                         <outlet property="lapRight" destination="AQp-5I-fS9" id="Eqt-NG-fPL"/>
+                        <outlet property="resetBtn" destination="tUC-lm-IYR" id="VTN-e8-aUJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="133" y="129"/>
+            <point key="canvasLocation" x="130.40000000000001" y="128.18590704647679"/>
         </scene>
     </scenes>
     <resources>
+        <image name="reset_button" width="512" height="512"/>
         <image name="timer_plain" width="640" height="640"/>
     </resources>
 </document>
