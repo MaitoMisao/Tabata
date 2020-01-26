@@ -42,48 +42,63 @@ class ViewController: UIViewController {
         resetBtn.isHidden = false
     }
     
-    
     //10秒スタート
     func timerStart() {
-        self.tenCount = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerCountDown), userInfo: nil, repeats: true)
+        self.tenCount = Timer.scheduledTimer(timeInterval: 1,
+                                             target: self,
+                                             selector: #selector(timerCountDown),
+                                             userInfo: nil,
+                                             repeats: true)
+        if !lapMiddle.isHidden {
+            view.backgroundColor = UIColor(hex: "fffc79")
+        }
     }
     
     //ワークアウト開始(20秒)
     func workoutStart() {
-        self.twentyCount = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(workoutCountDown), userInfo: nil, repeats: true)
+        self.twentyCount = Timer.scheduledTimer(timeInterval: 1,
+                                                target: self,
+                                                selector: #selector(workoutCountDown),
+                                                userInfo: nil,
+                                                repeats: true)
     }
     
     //タイマー起動中、ボタンを押したら止まる
     @objc func stopTime() {
         self.tenCount?.invalidate()
         self.twentyCount?.invalidate()
+        soundFile.player?.pause()
     }
     
     //FINISH後のイベント
     @objc func tapFinish() {
         resetAlert()
-        print("FINISHからの再開")
     }
     
     @objc func timerCountDown() {
         resetBtn.isHidden = false
         count -= 1
         countLabel.text = String(count)
-    
+        
+        if count == 10 && !lapMiddle.isHidden {
+            btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
+            view.backgroundColor = UIColor(hex: "fffc79")
+        }
         
         if count <= 1 {
-            //インターバルが0になった時に呼ばれる
-            if count == 1 {
-                leftCount += 1
-                lapLeft.text = String(leftCount)
-            }
-            
+            workoutCount = 21
             //インターバルタイマーストップ
             self.tenCount?.invalidate()
             workoutStart()
             
         } else if count == 3 {
             soundFile.beforeThreeCount(name: "Countdown", extentionName: "mp3")
+        }
+        
+        // 3秒以下かつ音楽が再生されていないこと
+        if count <= 3 && !(soundFile.player?.isPlaying ?? true) {
+            //音声再生
+            soundFile.player?.play()
         }
     }
     
@@ -95,7 +110,7 @@ class ViewController: UIViewController {
         showLap()
         view.backgroundColor = UIColor(hex: "ffc400")
         
-        if workoutCount <= 1 {
+        if workoutCount < 2 {
             // change処理
             if leftCount < 8 {
                 self.changeToIntervalTimerSetting()
@@ -111,34 +126,38 @@ class ViewController: UIViewController {
         } else if workoutCount == 3 {
             soundFile.beforeThreeCount(name: "Countdown", extentionName: "mp3")
         }
+        
+        // 3秒以下かつ音楽が再生されていないこと
+        if workoutCount <= 3 && !(soundFile.player?.isPlaying ?? true) {
+            //音声再生
+            soundFile.player?.play()
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         hideLap()
-        if count == 3 && workoutCount == 3 {
-            soundFile.audioPlayerDif()
-        }
-        
+        soundFile.audioPlayerDif()
     }
-    
-    
     
     @IBAction func btnAction(_ sender: UIButton) {
         
-        print("ボタンクリック")
         if sender.tag == 0 {
             sender.tag = 1
-            timerStart()
-            print("動く")
-            soundFile.player?.play()
+            
+            if count <= 1 {
+                workoutStart()
+            } else {
+                timerStart()
+            }
+            
         } else if workoutCount == 0 && leftCount == 8 {
             stopTime()
             tapFinish() //FINISH中タップした後、イベント発動
+            stopTime()
         } else {
             sender.tag = 0
             stopTime()
-            print("stop")
             soundFile.player?.pause()
         }
         
@@ -150,8 +169,20 @@ class ViewController: UIViewController {
                
         let resetAction = UIAlertAction(title: "リセット", style: .default, handler: {action in self.resetStartTimer()})
         
-        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in
+        var cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in
             self.timerStart()})
+        
+        //ワークアウト中のリセット処理
+        if count <= 1 && workoutCount <= 21 {
+            self.tenCount?.invalidate()
+            cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {action in
+            self.workoutStart()})
+        }
+        
+        //FINISH画面のキャンセル処理
+        if workoutCount == 0 && leftCount == 8 {
+            cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        }
         
         alertAction.addAction(resetAction)
         alertAction.addAction(cancelAction)
@@ -160,12 +191,10 @@ class ViewController: UIViewController {
     
     
     @IBAction func reset(_ sender: Any) {
+        
         resetAlert()
-        self.tenCount?.invalidate()
         stopTime()
-        print("リセットボタン押した")
     }
-    
     
     
     
@@ -178,24 +207,24 @@ class ViewController: UIViewController {
     //ワークアウトタイマー画像
     private func changeToWorkoutTimerImage() {
         btnStopAndRestart.setImage(UIImage(named: "timer_workout"), for: .normal)
+        
+        if workoutCount == 21 {
+            leftCount += 1
+            lapLeft.text = String(leftCount)
+        }
     }
     
     //インターバルタイマー画像
     private func changeToIntervalTimerSetting() {
-        btnStopAndRestart.setImage(UIImage(named: "timer_interval"), for: .normal)
         
-        workoutCount = 21
         self.twentyCount?.invalidate()
         self.hideLap()
-        
+        count = 11
+
         if lapLeft.isHidden == true {
             timerStart()
-            print("タイマー始動")
         }
-        
         showLap()
-        count = 11
-        view.backgroundColor = UIColor(hex: "fffc79")
     }
     //初期化
     private func resetStartTimer() {
