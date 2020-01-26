@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     
     var count = 11
     var workoutCount = 21
-    var leftCount = 6
+    var leftCount = 0
     var rightCount = 8
     
     var soundFile = Sound()
@@ -231,7 +231,7 @@ class ViewController: UIViewController {
         self.count = 11
         
         self.workoutCount = 21
-        self.leftCount = 7
+        self.leftCount = 1
         self.rightCount = 8
         
         //countLabel.textの更新
